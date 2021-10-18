@@ -36,7 +36,7 @@ int main()
 
 
 	//create the window
-	window = glfwCreateWindow(640, 480, "Learn OpenGL", NULL, NULL);
+	window = glfwCreateWindow(960, 540, "Learn OpenGL", NULL, NULL);
 
 	//verify window exists before trying to use it
 	if (!window)
@@ -64,10 +64,10 @@ int main()
 	{
 		float positions[] =
 		{
-			-0.5f, -0.5f, 0.0f, 0.0f,
-			 0.5f, -0.5f, 1.0f, 0.0f,
-			 0.5f,  0.5f, 1.0f, 1.0f,
-			-0.5f,  0.5f, 0.0f, 1.0f
+			100.0f, 100.0f, 0.0f, 0.0f,
+			200.0f, 100.0f, 1.0f, 0.0f,
+			200.0f, 200.0f, 1.0f, 1.0f,
+			100.0f, 200.0f, 0.0f, 1.0f
 		};
 
 		unsigned int indices[] = {
@@ -91,9 +91,15 @@ int main()
 
 		//create a projection matrix so that the 3d world can accuratly be cast onto the 2d pland that is the screen
 		//set to an orthographic view
-		//Takes (left, right, top, bottom, near, far) and the numbers used are to create
-		//a screen that has a 4:3 aspect ratio to match the resolution of the window (640, 480)
-		glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+		//Takes (left, right, top, bottom, near, far) and the numbers used are to create a projection that matches the window resolution
+		glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100.0f, 0.0f, 0.0f));
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200.0f, 200.0f, 0.0f));
+		
+		//Because we cant actually move the "camera" we have to move everything else
+		//Model View Matrix is how he controll the placement and we multiply these three matracies
+		//The order we multiply is Matrix, View, Model
+		glm::mat4 mvp = proj * view * model;
 
 		//Create shader and bind
 		Shader shader("res/shaders/Basic.shader");
@@ -103,7 +109,7 @@ int main()
 		//send the data
 		shader.SetUniform4f("u_Color", 0.8f, 0.1f, 0.8f, 1.0f);
 
-		shader.SetUniformMat4f("u_MVP", proj);
+		shader.SetUniformMat4f("u_MVP", mvp);
 
 		//create a texture and bind
 		Texture texture("res/textures/image.png");
