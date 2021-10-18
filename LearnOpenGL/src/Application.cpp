@@ -35,7 +35,7 @@ int main()
 	//create the window
 	window = glfwCreateWindow(640, 480, "Learn OpenGL", NULL, NULL);
 
-	//verify window
+	//verify window exists before trying to use it
 	if (!window)
 	{
 		glfwTerminate();
@@ -45,6 +45,7 @@ int main()
 	//make window current context
 	glfwMakeContextCurrent(window);
 
+	//sets the swap to match the display refresh rate
 	glfwSwapInterval(1);
 
 	//Init glew
@@ -71,6 +72,10 @@ int main()
 			2, 3, 0
 		};
 
+		//Allows blending of alpha pixles for textures
+		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+		GLCall(glEnable(GL_BLEND));
+
 		VertexArray va;
 		VertexBuffer vb(positions, 4 * 4 * sizeof(float));
 
@@ -87,8 +92,9 @@ int main()
 
 		//send information to the shader via uniforms
 		//send the data
-		shader.SetUniform4f("u_Color", 0.8f, 0.1f, 0.8f, 1.0f);
+		//shader.SetUniform4f("u_Color", 0.8f, 0.1f, 0.8f, 1.0f);
 
+		//create a texture and bind
 		Texture texture("res/textures/image.png");
 		texture.Bind();
 		shader.SetUniform1i("u_Texture", 0);
@@ -100,25 +106,27 @@ int main()
 		ib.Unbind();
 
 		//animate the color
-		float r = 0.0f;
-		float incriment = 0.05f;
+		//float r = 0.0f;
+		//float incriment = 0.05f;
 
 		Renderer renderer;
 
 		//loop
 		while (!glfwWindowShouldClose(window))
 		{
+			//Clear
 			renderer.Clear();
 
-			//draw call, give gl context
+			//Draw
 
 			shader.Bind();
-			shader.SetUniform4f("u_Color", r, 0.1f, 0.8f, 1.0f);
+			//shader.SetUniform4f("u_Color", r, 0.1f, 0.8f, 1.0f);
 
 			renderer.Draw(va, ib, shader);
 			
 
 			//animate color
+			/*
 			if (r > 1.0f)
 			{
 				incriment = -0.05f;
@@ -129,6 +137,7 @@ int main()
 			}
 
 			r += incriment;
+			*/
 
 			glfwSwapBuffers(window);
 

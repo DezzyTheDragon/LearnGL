@@ -84,24 +84,25 @@ void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2,
 //gets the given variable location in shader program
 unsigned int Shader::GetUniformLocation(const std::string& name)
 {
-	//holds the location
+	//OpenGL holds location as an ID
 	int location;
-	//check if the location has already been cached
+	//Locating uniforms can be a little intensive so we cach them to speed up accessing the uniform
 	if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
 	{
-		//if cached then set location to the cached value
 		location = m_UniformLocationCache[name];
 	}
 	else
 	{
 		//if not cached then get the locaiton
 		GLCall(location = glGetUniformLocation(m_RendererID, name.c_str()));
-		//check to make sure its there
+		//Verify that the location is found
+		//OpenGL can get rid of unused uniforms
 		if (location == -1)
 		{
 			std::cout << "Warning: uniform " << name << " doesn't exist" << std::endl;
 		}
 		//add to the cache
+		//add even if not found
 		m_UniformLocationCache[name] = location;
 		
 	}
