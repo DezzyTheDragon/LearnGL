@@ -13,6 +13,9 @@
 #include "Shader.h"
 #include "Texture.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
 //This is the main file for learning openGL project
 
 
@@ -56,8 +59,8 @@ int main()
 
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
-	//create a scope so that when the window terminates the program does not get stuck in an infanit loop when
-	//deconstructing opengl objects that no longer have a valid opengl context
+	//These curly braces create a scope so that when the window terminates the program does not 
+	//get stuck in an infanit loop when deconstructing opengl objects that no longer have a valid opengl context
 	{
 		float positions[] =
 		{
@@ -86,13 +89,21 @@ int main()
 
 		IndexBuffer ib(indices, 6);
 
+		//create a projection matrix so that the 3d world can accuratly be cast onto the 2d pland that is the screen
+		//set to an orthographic view
+		//Takes (left, right, top, bottom, near, far) and the numbers used are to create
+		//a screen that has a 4:3 aspect ratio to match the resolution of the window (640, 480)
+		glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+
 		//Create shader and bind
 		Shader shader("res/shaders/Basic.shader");
 		shader.Bind();
 
 		//send information to the shader via uniforms
 		//send the data
-		//shader.SetUniform4f("u_Color", 0.8f, 0.1f, 0.8f, 1.0f);
+		shader.SetUniform4f("u_Color", 0.8f, 0.1f, 0.8f, 1.0f);
+
+		shader.SetUniformMat4f("u_MVP", proj);
 
 		//create a texture and bind
 		Texture texture("res/textures/image.png");
@@ -106,8 +117,8 @@ int main()
 		ib.Unbind();
 
 		//animate the color
-		//float r = 0.0f;
-		//float incriment = 0.05f;
+		float r = 0.0f;
+		float incriment = 0.05f;
 
 		Renderer renderer;
 
@@ -120,13 +131,13 @@ int main()
 			//Draw
 
 			shader.Bind();
-			//shader.SetUniform4f("u_Color", r, 0.1f, 0.8f, 1.0f);
+			shader.SetUniform4f("u_Color", r, 0.1f, 0.8f, 1.0f);
 
 			renderer.Draw(va, ib, shader);
 			
 
 			//animate color
-			/*
+			
 			if (r > 1.0f)
 			{
 				incriment = -0.05f;
@@ -137,7 +148,7 @@ int main()
 			}
 
 			r += incriment;
-			*/
+			
 
 			glfwSwapBuffers(window);
 

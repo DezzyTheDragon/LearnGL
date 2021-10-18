@@ -81,20 +81,28 @@ void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2,
 	GLCall(glUniform4f(GetUniformLocation(name), v0, v1, v2, v3));
 }
 
+void Shader::SetUniformMat4f(const std::string& name, glm::mat4& matrix)
+{
+	//GL_FALSE because using glm math so we don't need to do anything to get the matrix to be layed out in memory the way gl wants
+	GLCall(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]));
+}
+
 //gets the given variable location in shader program
-unsigned int Shader::GetUniformLocation(const std::string& name)
+int Shader::GetUniformLocation(const std::string& name)
 {
 	//OpenGL holds location as an ID
-	int location;
+	//int location;
 	//Locating uniforms can be a little intensive so we cach them to speed up accessing the uniform
 	if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
 	{
-		location = m_UniformLocationCache[name];
+		//location = m_UniformLocationCache[name];
+		return m_UniformLocationCache[name];
 	}
 	else
 	{
 		//if not cached then get the locaiton
-		GLCall(location = glGetUniformLocation(m_RendererID, name.c_str()));
+		//GLCall(location = glGetUniformLocation(m_RendererID, name.c_str()));
+		GLCall(int location = glGetUniformLocation(m_RendererID, name.c_str()));
 		//Verify that the location is found
 		//OpenGL can get rid of unused uniforms
 		if (location == -1)
@@ -104,10 +112,10 @@ unsigned int Shader::GetUniformLocation(const std::string& name)
 		//add to the cache
 		//add even if not found
 		m_UniformLocationCache[name] = location;
-		
+		return location;
 	}
 	//return the location
-	return location;
+	//return location;
 }
 
 
