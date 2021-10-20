@@ -16,6 +16,10 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
 //This is the main file for learning openGL project
 
 
@@ -94,12 +98,8 @@ int main()
 		//Takes (left, right, top, bottom, near, far) and the numbers used are to create a projection that matches the window resolution
 		glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
 		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100.0f, 0.0f, 0.0f));
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200.0f, 200.0f, 0.0f));
 		
-		//Because we cant actually move the "camera" we have to move everything else
-		//Model View Matrix is how he controll the placement and we multiply these three matracies
-		//The order we multiply is Matrix, View, Model
-		glm::mat4 mvp = proj * view * model;
+
 
 		//Create shader and bind
 		Shader shader("res/shaders/Basic.shader");
@@ -109,7 +109,6 @@ int main()
 		//send the data
 		shader.SetUniform4f("u_Color", 0.8f, 0.1f, 0.8f, 1.0f);
 
-		shader.SetUniformMat4f("u_MVP", mvp);
 
 		//create a texture and bind
 		Texture texture("res/textures/image.png");
@@ -128,16 +127,60 @@ int main()
 
 		Renderer renderer;
 
+
+		//NOTE: this needs to be in the same context, can not init outside of the current context
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+
+		const char* glsl_version = "#version 330 core";
+
+		//true to auto install callback, if false I have to handle the callback
+		ImGui_ImplGlfw_InitForOpenGL(window, true);
+		ImGui_ImplOpenGL3_Init(glsl_version);
+
+		bool showDemoWindow = false;
+		glm::vec3 translation = glm::vec3(200, 200, 0);
+
 		//loop
 		while (!glfwWindowShouldClose(window))
 		{
+			
+			
 			//Clear
 			renderer.Clear();
 
 			//Draw
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+			//if(showDemoWindow)
+			//	ImGui::ShowDemoWindow();
+			{
+				static float f = 0.0f;
+				static int counter = 0;
+				ImGui::Begin("Debug");
+				//ImGui::Text("Example Text");
+				//ImGui::Checkbox("Show Demo window", &showDemoWindow);
+				//ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+				ImGui::SliderFloat3("Translation", &translation.x, 0.0f, 960.0f);
+				ImGui::Text("App average: %.3f ms/frame (%.1f FPS)", 1000/ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+				ImGui::End();
+
+			}
+			//ImGui::Text("Hello world");
+
+			ImGui::Render();
+			
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
+			glm::mat4 mvp = proj * view * model;
+
 
 			shader.Bind();
 			shader.SetUniform4f("u_Color", r, 0.1f, 0.8f, 1.0f);
+			shader.SetUniformMat4f("u_MVP", mvp);
 
 			renderer.Draw(va, ib, shader);
 			
@@ -158,10 +201,16 @@ int main()
 
 			glfwSwapBuffers(window);
 
+
 			glfwPollEvents();
+
 		}
 
 	}
+
+	ImGui_ImplGlfw_Shutdown();
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui::DestroyContext();
 
 	glfwTerminate();
 
