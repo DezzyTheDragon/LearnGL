@@ -1,23 +1,10 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include "Renderer.h"
-#include "VertexBuffer.h"
-#include "VertexBufferLayout.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "Shader.h"
-#include "Texture.h"
-
 #include "tests/TestClearColor.h"
 #include "tests/TestTexture.h"
-
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
+#include "tests/Test3D.h"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
@@ -91,7 +78,7 @@ int main()
 
 		testMenu->RegisterTest<test::TestClearColor>("Clear Color");
 		testMenu->RegisterTest<test::TestTexture>("Texture Test");
-		
+		testMenu->RegisterTest<test::Test3D>("3D Test");
 		
 		//loop
 		while (!glfwWindowShouldClose(window))
