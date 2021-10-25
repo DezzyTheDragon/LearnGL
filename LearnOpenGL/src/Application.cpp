@@ -53,6 +53,8 @@ int main()
 
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
+	//glCullFace(GL_FRONT);
+
 	//These curly braces create a scope so that when the window terminates the program does not 
 	//get stuck in an infanit loop when deconstructing opengl objects that no longer have a valid opengl context
 	{
