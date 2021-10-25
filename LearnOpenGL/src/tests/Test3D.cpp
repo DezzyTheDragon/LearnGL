@@ -11,6 +11,7 @@ namespace test
 						m_rotation(glm::vec3(0.0f, 0.0f, 0.0f))
 	{
 		//NOTE: remember this array is the object itself. DO NOT TRANSFORM 
+		//x, y, z, normal x, normal y, normal z
 		float positions[] = {
 			-25.0f, -25.0f, 0.0f, 0.0f, 0.0f, -1.0f,
 			 25.0f, -25.0f, 0.0f, 0.0f, 0.0f, -1.0f,
@@ -24,7 +25,7 @@ namespace test
 		};
 		
 		m_va = std::make_unique<VertexArray>();
-		//size is how big the positions array is, 4 * 3 * sizeof(float) because the positions is 4 vertacies with an x, y, z component
+		//The numbers chosen is for how big the positions array is (x * y * sizeof(datatype))
 		m_vb = std::make_unique<VertexBuffer>(positions, 4 * 6 * sizeof(float)); 
 
 
@@ -35,12 +36,15 @@ namespace test
 
 		m_ib = std::make_unique<IndexBuffer>(indicies, 6);
 
-		m_shader = std::make_unique<Shader>("res/shaders/BasicColor.shader");
+		//m_shader = std::make_unique<Shader>("res/shaders/BasicColor.shader");
+		m_shader = std::make_unique<Shader>("res/shaders/BasicLighting.shader");
 		m_shader->Bind();
 
-		m_shader->SetUniform4f("u_Color", 1.0f, 0.0f, 0.5f, 1.0f);
+		//m_shader->SetUniform4f("u_Color", 0.2f, 1.0f, 0.2f, 1.0f);
+		m_shader->SetUniform3f("u_Color", 0.2f, 1.0f, 0.2f);
 		m_shader->SetUniform3f("u_LightColor", 1.0f, 1.0f, 1.0f);
 		m_shader->SetUniform3f("u_LightPos", 0.0f, 0.0f, 0.0f);
+
 	}
 	Test3D::~Test3D()
 	{}
@@ -55,16 +59,6 @@ namespace test
 
 		Renderer render;
 		render.Clear();
-
-
-		//glm::mat4 model = glm::translate(glm::mat4(1), m_transform);
-
-		//glm::mat4 rotz = glm::rotate(model, (m_rotation.z/180.0f) * 3.1415f , glm::vec3(0.0f, 0.0f, 1.0f));
-		//glm::mat4 roty = glm::rotate(model, (m_rotation.y/180.0f) * 3.1415f , glm::vec3(0.0f, 1.0f, 0.0f));
-		//glm::mat4 rotx = glm::rotate(model, (m_rotation.x/180.0f) * 3.1415f , glm::vec3(1.0f, 0.0f, 0.0f));
-
-		//glm::mat4 model = glm::rotate(glm::translate(glm::mat4(1), m_transform), rotz, glm::vec3(0.0f, 0.0f, 1.0f));
-		//model = rotx * roty * rotz;
 		
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, m_transform);
